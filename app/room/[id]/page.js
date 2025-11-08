@@ -21,14 +21,23 @@ export default function RoomPage() {
       const userSnap = await getDoc(doc(db, "users", u.uid));
       setHandle(userSnap.exists() ? userSnap.data().handle : "anon");
 
-      const roomSnap = await getDoc(doc(db, "rooms", id));
-      setRoomMeta(roomSnap.exists() ? roomSnap.data() : { title: id });
+      const roomRef = doc(db, "rooms", id);
+      const unsubRoom = onSnapshot(roomRef, (snap) => {
+        if (snap.exists()) {
+          setRoomMeta(snap.data());
+        } else {
+          setRoomMeta({ title: id });
+        }
+      });
       const q = query(collection(db, "rooms", id, "messages"), orderBy("createdAt", "asc"));
-      const unsub = onSnapshot(q, (snap) => {
+      const unsubMessages = onSnapshot(q, (snap) => {
         setMessages(snap.docs.map(d => ({ id: d.id, ...d.data() })));
         setTimeout(()=>bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
       });
-      return () => unsub();
+      return () =>{
+        unsubMessages();
+        unsubRoom();
+      }   
     })();
   }, [id]);
 

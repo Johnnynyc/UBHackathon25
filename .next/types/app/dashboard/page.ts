@@ -1,4 +1,4 @@
-// File: /Users/animeshsaha/UB hacking/shopchat_scaffold/app/dashboard/page.js
+// File: /Users/johnnyc3/Documents/UBHacking25/UBHackathon25/app/dashboard/page.js
 import * as entry from '../../../../app/dashboard/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
