@@ -15,11 +15,31 @@ export default function Join() {
       const user = await ensureAnonAuth();
       const userRef = doc(db, "users", user.uid);
       const snap = await getDoc(userRef);
+      
       if (!snap.exists()) {
         await setDoc(userRef, { handle: randomHandle(), createdAt: serverTimestamp(), strikes: 0, canPost: true });
       }
-      if (!room) { setStatus("No room specified"); return; }
+
+      if (!room) { 
+        setStatus("No room specified"); 
+        return; 
+      }
+
+      const roomRef = doc(db, "rooms", room);
+      const roomSnap = await getDoc(roomRef);
+
+      //create room if does not exist
+      if (!roomSnap.exists()) {
+        setStatus("Creating room...");
+        await setDoc(roomRef, {
+          title: room,
+          Created: serverTimestamp(),
+          Expires: new Date(Date.now() + 60 * 60 * 1000), // expires in 1h (example)
+        });
+      }
+
       setStatus("Redirecting...");
+
       router.replace(`/room/${room}`);
     })();
   }, [room, router]);
