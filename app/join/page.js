@@ -20,7 +20,7 @@ export default function Join() {
       }
       if (!room) { setStatus("No room specified"); return; }
       setStatus("Redirecting...");
-      router.replace(`/room/${room}`);
+      router.replace(`/room/${encodeURIComponent(room)}`);
     })();
   }, [room, router]);
   return <div className="card p-4">{status}</div>;

@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { ensureAnonAuth, db, serverTimestamp, auth } from "@/lib/firebase";
 import { collection, doc, onSnapshot, orderBy, query, addDoc, getDoc } from "firebase/firestore";
@@ -7,7 +7,8 @@ import Message from "@/components/Message";
 import ChatInput from "@/components/ChatInput";
 
 export default function RoomPage() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = useMemo(() => decodeURIComponent(params?.id || ""), [params?.id]);
   const [user, setUser] = useState(null);
   const [handle, setHandle] = useState("anon");
   const [messages, setMessages] = useState([]);
@@ -110,9 +111,9 @@ export default function RoomPage() {
             disabled={summarizing}
             className="px-3 py-1 rounded bg-slate-800 text-white text-xs disabled:opacity-60"
           >
-            {summarizing ? "Summarizing..." : "Summarize now"}
+            {summarizing ? "Summarizing..." : "Summarize"}
           </button>
-          <span>Ephemeral • No signup</span>
+          
         </div>
       </div>
       <div className="card p-3 h-[60vh] overflow-y-auto">

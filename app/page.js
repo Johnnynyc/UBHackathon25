@@ -17,7 +17,7 @@ export default function Home() {
             <input
               id="room"
               name="room"
-              placeholder="demo-aisle7"
+              placeholder="Enter your room ID"
               className="flex-1 bg-slate-900 border border-slate-700 rounded px-3 py-2"
               required
             />
@@ -32,10 +32,8 @@ export default function Home() {
       </div>
 
       <div className="card p-4 space-y-3">
-        <p className="font-medium">Quick links</p>
         <ul className="list-disc list-inside text-sm text-gray-300">
-          <li><Link href="/join?room=demo-aisle7">Join Demo Room (Aisle 7)</Link></li>
-          <li><Link href="/dashboard">Store Dashboard</Link></li>
+
         </ul>
       </div>
     </main>
