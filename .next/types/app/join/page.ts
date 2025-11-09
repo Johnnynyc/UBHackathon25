@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 // File: /Users/johnnyc3/Documents/UBHacking25/UBHackathon25/app/join/page.js
-=======
-// File: C:\hackathon\UBHackathon25\app\join\page.js
->>>>>>> origin/chat-room-ui
 import * as entry from '../../../../app/join/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

@@ -1,17 +1,5 @@
 {
-<<<<<<< HEAD
-  "/_not-found/page": "app/_not-found/page.js",
   "/page": "app/page.js",
   "/join/page": "app/join/page.js",
   "/room/[id]/page": "app/room/[id]/page.js"
-=======
-<<<<<<< HEAD
-  "/page": "app/page.js",
-  "/join/page": "app/join/page.js",
-  "/room/[id]/page": "app/room/[id]/page.js",
-  "/api/assist/route": "app/api/assist/route.js"
-=======
-  "/page": "app/page.js"
->>>>>>> 321054896e2da2f66ba50b5782eed19978df3333
->>>>>>> origin/chat-room-ui
 }
