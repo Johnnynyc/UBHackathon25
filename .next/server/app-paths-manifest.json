@@ -1,5 +1,0 @@
-{
-  "/api/assist/route": "app/api/assist/route.js",
-  "/room/[id]/page": "app/room/[id]/page.js",
-  "/join/page": "app/join/page.js"
-}
