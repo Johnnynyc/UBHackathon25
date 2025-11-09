@@ -11,14 +11,13 @@ export default function Home() {
 
   function handleMakeRoom(e) {
     e.preventDefault();
-    if (!makeRoomName) return;
-    router.push(`/join?room=${encodeURIComponent(makeRoomName)}`);
+    if (!makeRoomName.trim()) return;
+    router.push(`/join?room=${encodeURIComponent(makeRoomName)}&create=true`);
   }
 
   function handleJoinRoom(e) {
     e.preventDefault();
     if (!joinRoomName.trim()) return;
-    // Pass create=false so join page knows to only join existing
     router.push(`/join?room=${encodeURIComponent(joinRoomName)}&create=false`);
   }
 
