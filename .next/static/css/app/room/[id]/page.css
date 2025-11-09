@@ -505,9 +505,6 @@ video {
 .mb-2 {
   margin-bottom: 0.5rem;
 }
-.mt-1 {
-  margin-top: 0.25rem;
-}
 .mt-4 {
   margin-top: 1rem;
 }
@@ -522,9 +519,6 @@ video {
 }
 .h-8 {
   height: 2rem;
-}
-.h-\[60vh\] {
-  height: 60vh;
 }
 .min-h-screen {
   min-height: 100vh;
@@ -556,26 +550,6 @@ video {
 .justify-center {
   justify-content: center;
 }
-.justify-between {
-  justify-content: space-between;
-}
-.gap-2 {
-  gap: 0.5rem;
-}
-.space-y-4 > :not([hidden]) ~ :not([hidden]) {
-  --tw-space-y-reverse: 0;
-  margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
-  margin-bottom: calc(1rem * var(--tw-space-y-reverse));
-}
-.overflow-y-auto {
-  overflow-y: auto;
-}
-.whitespace-pre-line {
-  white-space: pre-line;
-}
-.rounded {
-  border-radius: 0.25rem;
-}
 .rounded-full {
   border-radius: 9999px;
 }
@@ -600,19 +574,9 @@ video {
   --tw-bg-opacity: 1;
   background-color: rgb(202 232 224 / var(--tw-bg-opacity, 1));
 }
-.bg-slate-800 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(30 41 59 / var(--tw-bg-opacity, 1));
-}
-.bg-slate-900\/70 {
-  background-color: rgb(15 23 42 / 0.7);
-}
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1));
-}
-.p-3 {
-  padding: 0.75rem;
 }
 .p-4 {
   padding: 1rem;
@@ -620,58 +584,19 @@ video {
 .p-6 {
   padding: 1.5rem;
 }
-.px-3 {
-  padding-left: 0.75rem;
-  padding-right: 0.75rem;
-}
-.py-1 {
-  padding-top: 0.25rem;
-  padding-bottom: 0.25rem;
-}
 .text-center {
   text-align: center;
-}
-.text-2xl {
-  font-size: 1.5rem;
-  line-height: 2rem;
-}
-.text-sm {
-  font-size: 0.875rem;
-  line-height: 1.25rem;
 }
 .text-xl {
   font-size: 1.25rem;
   line-height: 1.75rem;
 }
-.text-xs {
-  font-size: 0.75rem;
-  line-height: 1rem;
-}
 .font-bold {
   font-weight: 700;
-}
-.font-semibold {
-  font-weight: 600;
-}
-.text-amber-300 {
-  --tw-text-opacity: 1;
-  color: rgb(252 211 77 / var(--tw-text-opacity, 1));
-}
-.text-gray-200 {
-  --tw-text-opacity: 1;
-  color: rgb(229 231 235 / var(--tw-text-opacity, 1));
-}
-.text-gray-400 {
-  --tw-text-opacity: 1;
-  color: rgb(156 163 175 / var(--tw-text-opacity, 1));
 }
 .text-gray-600 {
   --tw-text-opacity: 1;
   color: rgb(75 85 99 / var(--tw-text-opacity, 1));
-}
-.text-white {
-  --tw-text-opacity: 1;
-  color: rgb(255 255 255 / var(--tw-text-opacity, 1));
 }
 .shadow-lg {
   --tw-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
@@ -794,11 +719,6 @@ video {
   font-family: monopolyFont;
   cursor: pointer;
   margin-left: 10px;
-}
-
-
-.disabled\:opacity-60:disabled {
-  opacity: 0.6;
 }
 /*!************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[13].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[13].oneOf[12].use[3]!./app/room/[id]/chatRoom.css ***!

@@ -1,14 +1,15 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import { ensureAnonAuth, db, serverTimestamp, auth } from "@/lib/firebase";
 import { collection, doc, onSnapshot, orderBy, query, addDoc, getDoc } from "firebase/firestore";
 import Message from "@/components/Message";
 import ChatInput from "@/components/ChatInput";
-import './chatRoom.css';
+import "./chatRoom.css";
 
 export default function RoomPage() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = useMemo(() => decodeURIComponent(params?.id || ""), [params?.id]);
   const [user, setUser] = useState(null);
   const [handle, setHandle] = useState("anon");
   const [messages, setMessages] = useState([]);
@@ -17,6 +18,7 @@ export default function RoomPage() {
   const [handleMap, setHandleMap] = useState({});
   const [summary, setSummary] = useState("");
   const [summarizing, setSummarizing] = useState(false);
+  const [aiStatus, setAiStatus] = useState("");
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -30,32 +32,48 @@ export default function RoomPage() {
       setRoomMeta(roomSnap.exists() ? roomSnap.data() : { title: id });
       const q = query(collection(db, "rooms", id, "messages"), orderBy("createdAt", "asc"));
       const unsub = onSnapshot(q, (snap) => {
-        const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        const docs = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
         setMessages(docs);
         hydrateHandles(docs);
-        setTimeout(()=>bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
+        setTimeout(() => bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
       });
       return () => unsub();
     })();
   }, [id]);
 
   async function send(text) {
+    const trimmed = text.trim();
+    if (!trimmed) return;
     const u = auth.currentUser;
+    const askMatch = trimmed.match(/^\\(ask|mr\.?\s*monopoly)\s*(.*)$/i);
+    const isAsk = Boolean(askMatch);
+    const question = askMatch ? askMatch[2].trim() : "";
+
+    const outgoingText = isAsk ? (question || trimmed) : trimmed;
+    if (isAsk && !question.length) {
+      setAiStatus("Add a question after \\ask to query Mr. Monopoly.");
+      return;
+    }
+
     await addDoc(collection(db, "rooms", id, "messages"), {
       uid: u.uid,
       handle,
-      text,
+      text: outgoingText,
       createdAt: serverTimestamp(),
       type: "user"
     });
+
+    if (isAsk) {
+      await handleAsk(question);
+    }
   }
 
   async function hydrateHandles(msgs) {
     const missing = [
       ...new Set(
         msgs
-          .map(m => m.uid)
-          .filter(uid => uid && !handleCacheRef.current[uid])
+          .map((m) => m.uid)
+          .filter((uid) => uid && !handleCacheRef.current[uid])
       )
     ];
     if (!missing.length) return;
@@ -101,33 +119,50 @@ export default function RoomPage() {
     }
   }
 
-
-
-
-
+  async function handleAsk(question) {
+    try {
+      setAiStatus("Mr. Monopoly is thinking…");
+      const res = await fetch("/api/assist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roomId: id, mode: "qa", question })
+      });
+      if (!res.ok) {
+        let errMsg = "Gemini request failed";
+        try {
+          const err = await res.json();
+          errMsg = err.details || err.error || errMsg;
+        } catch (_) {}
+        throw new Error(errMsg);
+      }
+      const data = await res.json();
+      const answer = data.text || "No response.";
+      await addDoc(collection(db, "rooms", id, "messages"), {
+        uid: "mr-monopoly",
+        handle: "Mr. Monopoly",
+        text: answer,
+        type: "assistant",
+        createdAt: serverTimestamp()
+      });
+      setAiStatus("");
+    } catch (err) {
+      setAiStatus(err.message);
+    }
+  }
 
   return (
     <main>
-      
-
       <div>
         <h1 className="roomTitle">{roomMeta?.title || `Room ${id}`}</h1>
-        
-
-
-        
         <div className="ai-button">
-          <button
-            onClick={summarizeRoom}
-            disabled={summarizing}
-          >
+          <button onClick={summarizeRoom} disabled={summarizing}>
             {summarizing ? "Summarizing..." : "Summarize Now"}
           </button>
         </div>
       </div>
 
       <div className="text-chat-box">
-        {messages.map(m => (
+        {messages.map((m) => (
           <Message
             key={m.id}
             m={m}
@@ -139,6 +174,7 @@ export default function RoomPage() {
       </div>
 
       <ChatInput onSend={send} />
+      {aiStatus && <div className="ai-status">{aiStatus}</div>}
       {summary && (
         <div className="ai-card">
           <p className="ai-summary-header">Summary</p>
@@ -146,9 +182,6 @@ export default function RoomPage() {
         </div>
       )}
 
-
-
-    
     </main>
   );
 }
