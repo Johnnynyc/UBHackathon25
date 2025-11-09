@@ -1,5 +1,9 @@
 {
   "node": {},
   "edge": {},
+<<<<<<< HEAD
   "encryptionKey": "POPdYkDp6s5LLt9IDqv9/65qRef6wDjUaTVooQwbmi0="
+=======
+  "encryptionKey": "GfCBzDzXVCLT4F41Y0AxLiXNGr2yUmPY1M+h+keRQLQ="
+>>>>>>> fb003ff4527d50763ab9071386c54273d4f483fa
 }
