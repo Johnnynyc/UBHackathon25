@@ -5,6 +5,8 @@ import { ensureAnonAuth, db, serverTimestamp, auth } from "@/lib/firebase";
 import { collection, doc, onSnapshot, orderBy, query, addDoc, getDoc } from "firebase/firestore";
 import Message from "@/components/Message";
 import ChatInput from "@/components/ChatInput";
+import './chatRoom.css';
+
 
 export default function RoomPage() {
   const { id } = useParams();
@@ -12,6 +14,10 @@ export default function RoomPage() {
   const [handle, setHandle] = useState("anon");
   const [messages, setMessages] = useState([]);
   const [roomMeta, setRoomMeta] = useState(null);
+  const handleCacheRef = useRef({});
+  const [handleMap, setHandleMap] = useState({});
+  const [summary, setSummary] = useState("");
+  const [summarizing, setSummarizing] = useState(false);
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -25,7 +31,9 @@ export default function RoomPage() {
       setRoomMeta(roomSnap.exists() ? roomSnap.data() : { title: id });
       const q = query(collection(db, "rooms", id, "messages"), orderBy("createdAt", "asc"));
       const unsub = onSnapshot(q, (snap) => {
-        setMessages(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        setMessages(docs);
+        hydrateHandles(docs);
         setTimeout(()=>bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
       });
       return () => unsub();
@@ -43,17 +51,108 @@ export default function RoomPage() {
     });
   }
 
+  async function hydrateHandles(msgs) {
+    const missing = [
+      ...new Set(
+        msgs
+          .map(m => m.uid)
+          .filter(uid => uid && !handleCacheRef.current[uid])
+      )
+    ];
+    if (!missing.length) return;
+    const updates = {};
+    await Promise.all(
+      missing.map(async (uid) => {
+        const snap = await getDoc(doc(db, "users", uid));
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data?.handle) updates[uid] = data.handle;
+        }
+      })
+    );
+    if (Object.keys(updates).length) {
+      handleCacheRef.current = { ...handleCacheRef.current, ...updates };
+      setHandleMap({ ...handleCacheRef.current });
+    }
+  }
+
+  async function summarizeRoom() {
+    try {
+      setSummarizing(true);
+      setSummary("");
+      const res = await fetch("/api/assist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roomId: id, mode: "summary" })
+      });
+      if (!res.ok) {
+        let errMsg = "Failed to summarize";
+        try {
+          const errBody = await res.json();
+          errMsg = errBody.details || errBody.error || errMsg;
+        } catch (_) {}
+        throw new Error(errMsg);
+      }
+      const data = await res.json();
+      setSummary(data.text);
+    } catch (err) {
+      setSummary(err.message);
+    } finally {
+      setSummarizing(false);
+    }
+  }
+
+
+
+
+
+
   return (
-    <main className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">{`Room: ${id}`}</h1>
+    <main>
+      
+
+      <div>
+        <h1 className="roomTitle">{roomMeta?.title || `Room ${id}`}</h1>
+        
+
+
+        
+        <div className="ai-button">
+          <button
+            onClick={summarizeRoom}
+            disabled={summarizing}
+          >
+            {summarizing ? "Summarizing..." : "Summarize Now"}
+          </button>
+        </div>
       </div>
-      <div className="card p-3 h-[60vh] overflow-y-auto">
-        {messages.map(m => <Message key={m.id} m={m} self={user} />)}
+
+      <div className="text-chat-box">
+        {messages.map(m => (
+          <Message
+            key={m.id}
+            m={m}
+            self={user}
+            displayHandle={handleMap[m.uid] || m.handle}
+          />
+        ))}
         <div ref={bottomRef} />
       </div>
+
       <ChatInput onSend={send} />
-      <div className="text-xs text-gray-400">By chatting, you agree to be nice. Spam & slurs auto-muted.</div>
+      {summary && (
+        <div className="ai-card">
+          <p className="ai-summary-header">Summary</p>
+          <p className="ai-data">{summary}</p>
+        </div>
+      )}
+
+
+
+
+      <div className="disclaimer">By chatting, you agree to be nice. Spam & slurs auto-muted.</div>
+
+    
     </main>
   );
 }

@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@font-face {
+    font-family: monopolyFont;
+    src: url(../../assets/MuseoModerno-VariableFont_wght.ttf);
+}
+
+
+html, body {
+  background: #cde6d0;
+  color: #000000;
+  margin: 0;
+  padding: 0;
+  background-image: url("/monopolyBoard.png");
+  background-size: 100vh;
+  background-repeat: no-repeat;
+  background-position-x: 25%;
+
+
+  
+}
+
+.main{
+    width: 100%;
+    height: 100%;
+}
+
+.roomTitle{
+    color: black;
+    height: 100%;
+    width: 75%;
+    min-width: 800px;
+    text-align: center;
+    padding-top: 15vh;
+    font-family: monopolyFont;
+    font-size: 2em;
+
+}
+
+.ai-button{
+    color: white;
+    background-color: red;
+    height: 0%;
+    width: auto;
+    text-align: center;
+    font-family: monopolyFont;
+    border-radius: 5px;
+    font-size: 1.5em;
+    border: 1px solid black;
+    float: right;
+    margin-right: 10%;
+    padding: 20px;
+    cursor: pointer;
+
+}
+
+.ai-card {
+    background-color: #E4FFF8;
+    border: 2px solid black;
+    border-radius: 5px;
+    max-width: 20%;
+    padding: 20px;
+    position: fixed;  
+    top: 32vh;      
+    right: 10vw;     
+    height: auto; 
+}
+
+@media (max-width: 1000px) {
+    .ai-card {
+        background-color: #E4FFF8;
+        border: 2px solid black;
+        border-radius: 5px;
+        max-width: 30%;
+        padding: 20px;
+        position: fixed;  
+        top: 32vh;      
+        right: 10vw;     
+        height: auto;  
+    }
+}
+
+
+
+.ai-summary-header{
+    color: black;
+    font-family: monopolyFont;
+    text-align: center;
+    font-size: 2em;
+    text-decoration: underline;
+}
+
+.ai-data{
+    color: black;
+    font-family: monopolyFont;
+    text-align: center;
+    font-size: 1.2em;
+}
+
+
+
+
+
+
+.text-chat-box{
+    background-color: #E4FFF8;
+    height: 28em;
+    max-height: 1000px;
+    width: 38%;
+    overflow-x: hidden;
+    overflow-y: auto; 
+    scrollbar-color: red;
+    scrollbar-width: thin;
+    margin-left: 20%;
+    border: 2px solid black;
+    border-radius: 5px;
+    padding: 15px;
+
+}
+
+
+.disclaimer{
+    color: Red;
+    font-family: monopolyFont;
+    margin-left: 20%;
+    width: 35em;
+    text-align: center;
+}
+
