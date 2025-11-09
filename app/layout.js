@@ -1,4 +1,4 @@
-export const metadata = { title: "Ice Breaker", description: "QR → ephemeral in-store chats" };
+export const metadata = { title: "Ice Breaker"};
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
