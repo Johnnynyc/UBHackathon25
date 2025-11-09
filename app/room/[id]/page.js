@@ -17,6 +17,7 @@ export default function RoomPage() {
   const [handleMap, setHandleMap] = useState({});
   const [summary, setSummary] = useState("");
   const [summarizing, setSummarizing] = useState(false);
+  const [aiStatus, setAiStatus] = useState("");
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -40,14 +41,29 @@ export default function RoomPage() {
   }, [id]);
 
   async function send(text) {
+    const trimmed = text.trim();
+    if (!trimmed) return;
     const u = auth.currentUser;
+    const isAsk = trimmed.startsWith("\\Mr. Monopoly");
+    const question = isAsk ? trimmed.replace(/^\\ask\s*/i, "").trim() : "";
+
+    const outgoingText = isAsk ? question : trimmed;
+    if (!outgoingText.length) {
+      setAiStatus("Add a question after \\ask to query Gemini.");
+      return;
+    }
+
     await addDoc(collection(db, "rooms", id, "messages"), {
       uid: u.uid,
       handle,
-      text,
+      text: outgoingText,
       createdAt: serverTimestamp(),
       type: "user"
     });
+
+    if (isAsk) {
+      await handleAsk(question);
+    }
   }
 
   async function hydrateHandles(msgs) {
@@ -101,6 +117,37 @@ export default function RoomPage() {
     }
   }
 
+  async function handleAsk(question) {
+    try {
+      setAiStatus("Asking Gemini…");
+      const res = await fetch("/api/assist", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ roomId: id, mode: "qa", question })
+      });
+      if (!res.ok) {
+        let errMsg = "Gemini request failed";
+        try {
+          const err = await res.json();
+          errMsg = err.details || err.error || errMsg;
+        } catch (_) {}
+        throw new Error(errMsg);
+      }
+      const data = await res.json();
+      const answer = data.text || "No response.";
+      await addDoc(collection(db, "rooms", id, "messages"), {
+        uid: "Mr. Monopoly",
+        handle: "Mr. Monopoly",
+        text: answer,
+        type: "Your guide",
+        createdAt: serverTimestamp()
+      });
+      setAiStatus("");
+    } catch (err) {
+      setAiStatus(err.message);
+    }
+  }
+
   return (
     <main className="space-y-4">
       <div className="flex items-center justify-between">
@@ -128,6 +175,7 @@ export default function RoomPage() {
         <div ref={bottomRef} />
       </div>
       <ChatInput onSend={send} />
+      {aiStatus && <div className="text-sm text-amber-300">{aiStatus}</div>}
       {summary && (
         <div className="card p-3 bg-slate-900/70">
           <p className="text-sm font-semibold">Summary</p>
