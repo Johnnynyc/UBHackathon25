@@ -12,6 +12,8 @@ export default function RoomPage() {
   const [handle, setHandle] = useState("anon");
   const [messages, setMessages] = useState([]);
   const [roomMeta, setRoomMeta] = useState(null);
+  const handleCacheRef = useRef({});
+  const [handleMap, setHandleMap] = useState({});
   const [summary, setSummary] = useState("");
   const [summarizing, setSummarizing] = useState(false);
   const bottomRef = useRef(null);
@@ -27,7 +29,9 @@ export default function RoomPage() {
       setRoomMeta(roomSnap.exists() ? roomSnap.data() : { title: id });
       const q = query(collection(db, "rooms", id, "messages"), orderBy("createdAt", "asc"));
       const unsub = onSnapshot(q, (snap) => {
-        setMessages(snap.docs.map(d => ({ id: d.id, ...d.data() })));
+        const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        setMessages(docs);
+        hydrateHandles(docs);
         setTimeout(()=>bottomRef.current?.scrollIntoView({ behavior: "smooth" }), 50);
       });
       return () => unsub();
@@ -43,6 +47,31 @@ export default function RoomPage() {
       createdAt: serverTimestamp(),
       type: "user"
     });
+  }
+
+  async function hydrateHandles(msgs) {
+    const missing = [
+      ...new Set(
+        msgs
+          .map(m => m.uid)
+          .filter(uid => uid && !handleCacheRef.current[uid])
+      )
+    ];
+    if (!missing.length) return;
+    const updates = {};
+    await Promise.all(
+      missing.map(async (uid) => {
+        const snap = await getDoc(doc(db, "users", uid));
+        if (snap.exists()) {
+          const data = snap.data();
+          if (data?.handle) updates[uid] = data.handle;
+        }
+      })
+    );
+    if (Object.keys(updates).length) {
+      handleCacheRef.current = { ...handleCacheRef.current, ...updates };
+      setHandleMap({ ...handleCacheRef.current });
+    }
   }
 
   async function summarizeRoom() {
@@ -87,7 +116,14 @@ export default function RoomPage() {
         </div>
       </div>
       <div className="card p-3 h-[60vh] overflow-y-auto">
-        {messages.map(m => <Message key={m.id} m={m} self={user} />)}
+        {messages.map(m => (
+          <Message
+            key={m.id}
+            m={m}
+            self={user}
+            displayHandle={handleMap[m.uid] || m.handle}
+          />
+        ))}
         <div ref={bottomRef} />
       </div>
       <ChatInput onSend={send} />

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { initializeApp, getApps } from "firebase/app";
-import { getFirestore, collection, query, orderBy, limit, getDocs } from "firebase/firestore";
+import { getFirestore, collection, query, orderBy, limit, getDocs, doc, getDoc } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -16,9 +16,9 @@ const db = getFirestore(app);
 
 function buildPrompt(mode, history, question) {
   if (mode === "qa" && question) {
-    return `You are ShopChat, a helpful in-store associate. Use ONLY the conversation below to answer the question at the end.\n\nConversation:\n${history}\n\nQuestion: ${question}\nAnswer:`;
+    return `You are ShopChat, a helpful in-store associate. Use ONLY the conversation below to answer the question at the end. Always refer to people by their @handle exactly as shown.\n\nConversation:\n${history}\n\nQuestion: ${question}\nAnswer:`;
   }
-  return `You are ShopChat, a helpful in-store associate. Summarize the following conversation into 3 concise bullet points focused on shopper intent and staff actions.\n\nConversation:\n${history}\n\nSummary:`;
+  return `You are ShopChat, a helpful in-store associate. Summarize the following conversation into 3 concise bullet points. Quote each participant by their @handle exactly as shown.\n\nConversation:\n${history}\n\nSummary:`;
 }
 
 const MODEL_ID = process.env.GEMINI_MODEL || "gemini-1.5-flash-latest";
@@ -46,11 +46,31 @@ export async function POST(req) {
       )
     );
 
-    const history = messagesSnap.docs
-      .map((docSnap) => docSnap.data())
+    const messages = messagesSnap.docs.map((docSnap) => ({ id: docSnap.id, ...docSnap.data() }));
+
+    const missingHandleUids = [
+      ...new Set(
+        messages
+          .filter((msg) => !msg.handle && typeof msg.uid === "string")
+          .map((msg) => msg.uid)
+      )
+    ];
+
+    const handleMap = {};
+    await Promise.all(
+      missingHandleUids.map(async (uid) => {
+        const userSnap = await getDoc(doc(db, "users", uid));
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          if (data?.handle) handleMap[uid] = data.handle;
+        }
+      })
+    );
+
+    const history = messages
       .filter((msg) => typeof msg?.text === "string" && msg.text.trim().length)
       .reverse()
-      .map((msg) => `${msg.handle || msg.uid || "shopper"}: ${msg.text}`)
+      .map((msg) => `${msg.handle || handleMap[msg.uid] || msg.uid || "guest"}: ${msg.text}`)
       .join("\n");
 
     if (!history) {
