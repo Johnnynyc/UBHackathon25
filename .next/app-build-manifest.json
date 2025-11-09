@@ -10,6 +10,7 @@
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/layout.js"
+<<<<<<< HEAD
     ],
     "/join/page": [
       "static/chunks/webpack.js",
@@ -21,11 +22,16 @@
       "static/chunks/main-app.js",
       "static/css/app/room/[id]/page.css",
       "static/chunks/app/room/[id]/page.js"
+<<<<<<< HEAD
     ],
     "/_not-found/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/chunks/app/_not-found/page.js"
+=======
+=======
+>>>>>>> 321054896e2da2f66ba50b5782eed19978df3333
+>>>>>>> origin/chat-room-ui
     ]
   }
 }

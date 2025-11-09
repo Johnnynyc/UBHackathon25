@@ -91,18 +91,6 @@
 /******/ 		};
 /******/ 	}();
 /******/ 	
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	!function() {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = function(module) {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				function() { return module['default']; } :
-/******/ 				function() { return module; };
-/******/ 			__webpack_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	}();
-/******/ 	
 /******/ 	/* webpack/runtime/create fake namespace object */
 /******/ 	!function() {
 /******/ 		var getProto = Object.getPrototypeOf ? function(obj) { return Object.getPrototypeOf(obj); } : function(obj) { return obj.__proto__; };
@@ -192,7 +180,15 @@
 /******/ 	
 /******/ 	/* webpack/runtime/getFullHash */
 /******/ 	!function() {
+<<<<<<< HEAD
 /******/ 		__webpack_require__.h = function() { return "616858ce556d09ca"; }
+=======
+<<<<<<< HEAD
+/******/ 		__webpack_require__.h = function() { return "b986208dbf8b278f"; }
+=======
+/******/ 		__webpack_require__.h = function() { return "8f576417a5d4fb17"; }
+>>>>>>> 321054896e2da2f66ba50b5782eed19978df3333
+>>>>>>> origin/chat-room-ui
 /******/ 	}();
 /******/ 	
 /******/ 	/* webpack/runtime/global */
