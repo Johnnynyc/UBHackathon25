@@ -44,12 +44,13 @@ export default function RoomPage() {
     const trimmed = text.trim();
     if (!trimmed) return;
     const u = auth.currentUser;
-    const isAsk = trimmed.startsWith("\\Mr. Monopoly");
-    const question = isAsk ? trimmed.replace(/^\\ask\s*/i, "").trim() : "";
+    const askMatch = trimmed.match(/^\\(ask|mr\.?\s*monopoly)\s*(.*)$/i);
+    const isAsk = Boolean(askMatch);
+    const question = askMatch ? askMatch[2].trim() : "";
 
-    const outgoingText = isAsk ? question : trimmed;
-    if (!outgoingText.length) {
-      setAiStatus("Add a question after \\ask to query Gemini.");
+    const outgoingText = isAsk ? (question || trimmed) : trimmed;
+    if (isAsk && !question.length) {
+      setAiStatus("Add a question after \\ask to query Mr. Monopoly.");
       return;
     }
 
