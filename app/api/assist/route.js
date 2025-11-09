@@ -16,9 +16,9 @@ const db = getFirestore(app);
 
 function buildPrompt(mode, history, question) {
   if (mode === "qa" && question) {
-    return `You are ShopChat, a helpful in-store associate. Use ONLY the conversation below to answer the question at the end. Always refer to people by their @handle exactly as shown.\n\nConversation:\n${history}\n\nQuestion: ${question}\nAnswer:`;
+    return `You are Ice-Breaker. A social media ai assistant. Use ONLY the conversation below to answer the question at the end. Always refer to people by their @handle exactly as shown.\n\nConversation:\n${history}\n\nQuestion: ${question}\nAnswer:`;
   }
-  return `You are ShopChat, a helpful in-store associate. Summarize the following conversation into 3 concise bullet points. Quote each participant by their @handle exactly as shown.\n\nConversation:\n${history}\n\nSummary:`;
+  return `You are Ice-Breaker. A social media ai assistant. Summarize the following conversation into 3 concise bullet points. Quote each participant by their @handle exactly as shown.\n\nConversation:\n${history}\n\nSummary:`;
 }
 
 const MODEL_ID = process.env.GEMINI_MODEL || "gemini-1.5-flash-latest";
